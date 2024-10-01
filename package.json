@@ -34,7 +34,7 @@
     "@types/node": "^20.2.1",
     "chai": "^4.3.7",
     "ethers": "^5.0.0",
-    "hardhat": "^2.14.0",
+    "hardhat": "^2.22.12",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.1",
     "typescript": "^5.0.4"

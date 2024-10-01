@@ -60,10 +60,10 @@ describe("#e2e", () => {
 
     // Generate new semaphore identity and add to group
     identity = new Identity();
-    await semaphoreContract.addMember(2023, identity.commitment);
+    await semaphoreContract.addMembers(groupId, [identity.commitment, 3n, 4n]);
 
     // Construct a local copy of same group
-    group = new Group(groupId, 20, [identity.commitment]);
+    group = new Group(groupId, 20, [identity.commitment, 3n, 4n]);
 
     // Deploy account factory
     factoryContract = await new SemaphoreAccountFactory__factory(
