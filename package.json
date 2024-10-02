@@ -1,19 +1,22 @@
 {
-  "name": "semaphore-wallet",
+  "name": "@jimmychu0807/semaphore-wallet",
   "version": "1.1.0",
-  "description": "",
+  "description": "Semaphore Wallet",
   "main": "index.js",
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test --network localhost"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["Semaphore", "MSCA"],
+  "contributors": [
+    "Saleel P <saleel@saleel.xyz>",
+    "Jimmy Chu <jimmychu0807@gmail.com>"
+  ],
   "license": "ISC",
   "dependencies": {
     "@account-abstraction/contracts": "^0.6.0",
     "@account-abstraction/utils": "link:../aa-bundler/packages/utils",
-    "@openzeppelin/contracts": "^4.8.3",
+    "@openzeppelin/contracts": "^5.0.2",
     "@semaphore-protocol/contracts": "^3.10.1",
     "@semaphore-protocol/group": "^3.10.1",
     "@semaphore-protocol/hardhat": "^3.10.1",

@@ -24,8 +24,7 @@ import { getEntryPointAddress } from "@account-abstraction/utils";
 // Based on https://github.com/eth-infinitism/bundler#running-local-node
 const BUNDLER_URL = "http://localhost:3000/rpc";
 const ENTRYPOINT_ADDRESS = getEntryPointAddress();
-
-console.log("ENTRYPOINT_ADDR:", ENTRYPOINT_ADDRESS);
+console.log("ENTRYPOINT_ADDRESS:", ENTRYPOINT_ADDRESS);
 
 const wasmFilePath = `snark-artifacts/semaphore.wasm`;
 const zkeyFilePath = `snark-artifacts/semaphore.zkey`;
@@ -41,6 +40,7 @@ describe("#e2e", () => {
   let factoryContract: SemaphoreAccountFactory;
   let identity: Identity;
   let group: Group;
+  let groupId: number;
 
   before(async () => {
     ethersProvider = ethers.provider;
@@ -53,7 +53,7 @@ describe("#e2e", () => {
     });
 
     // Create new semaphore on-chain group
-    const groupId = 2023;
+    groupId = 2023;
     await semaphoreContract["createGroup(uint256,uint256,address)"](
       groupId,
       20, // tree depth
@@ -77,7 +77,7 @@ describe("#e2e", () => {
 
   it("should send UserOp to the bundler to have the wallet created and transfer some eth", async () => {
     const salt = Math.round(Math.random() * 100000);
-    const walletAddress = await factoryContract.getAddress(2023, salt);
+    const walletAddress = await factoryContract.getAddress(groupId, salt);
 
     console.log("Counterfactual Wallet address: ", walletAddress);
 
