@@ -20,7 +20,6 @@ import { BigNumber, Signer } from "ethers";
 import { Provider } from "@ethersproject/abstract-provider";
 import { EntryPoint__factory } from "@account-abstraction/contracts";
 import { getEntryPointAddress } from "@account-abstraction/utils";
-import fetch from "node-fetch";
 
 // Based on https://github.com/eth-infinitism/bundler#running-local-node
 const BUNDLER_URL = "http://localhost:3000/rpc";
