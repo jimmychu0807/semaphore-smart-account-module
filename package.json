@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@account-abstraction/contracts": "^0.6.0",
-    "@account-abstraction/utils": "link:../bundler/packages/utils",
+    "@account-abstraction/utils": "link:../aa-bundler/packages/utils",
     "@openzeppelin/contracts": "^4.8.3",
     "@semaphore-protocol/contracts": "^3.10.1",
     "@semaphore-protocol/group": "^3.10.1",
@@ -21,6 +21,7 @@
     "@semaphore-protocol/proof": "^3.10.1",
     "@zk-kit/incremental-merkle-tree.sol": "^1.7.0",
     "big-integer": "^1.6.51",
+    "circomlibjs": "^0.1.7",
     "poseidon-solidity": "^0.0.5"
   },
   "devDependencies": {
@@ -33,6 +34,7 @@
     "@typechain/ethers-v5": "^10.2.1",
     "@typechain/hardhat": "^6.1.6",
     "@types/chai": "^4.3.5",
+    "@types/circomlibjs": "^0.1.6",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.2.1",
     "chai": "^4.3.7",
