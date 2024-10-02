@@ -1,9 +1,10 @@
 {
-  "name": "aa-test",
-  "version": "1.0.0",
+  "name": "semaphore-wallet",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "compile": "hardhat compile",
     "test": "hardhat test --network localhost"
   },
   "keywords": [],
@@ -11,14 +12,17 @@
   "license": "ISC",
   "dependencies": {
     "@account-abstraction/contracts": "^0.6.0",
+    "@account-abstraction/utils": "jimmychu0807/aa-bundler#semaphore-wallet/v1.1.0",
     "@openzeppelin/contracts": "^4.8.3",
     "@semaphore-protocol/contracts": "^3.10.1",
     "@semaphore-protocol/group": "^3.10.1",
     "@semaphore-protocol/hardhat": "^3.10.1",
     "@semaphore-protocol/identity": "^3.10.1",
     "@semaphore-protocol/proof": "^3.10.1",
+    "@zk-kit/incremental-merkle-tree.sol": "^1.7.0",
     "big-integer": "^1.6.51",
-    "node-fetch": "^2.3.0"
+    "node-fetch": "^3.3.2",
+    "poseidon-solidity": "^0.0.5"
   },
   "devDependencies": {
     "@ethersproject/abstract-provider": "^5.7.0",

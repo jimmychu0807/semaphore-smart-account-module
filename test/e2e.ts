@@ -19,11 +19,14 @@ import { UserOperation, getUserOpHash } from "./helpers";
 import { BigNumber, Signer } from "ethers";
 import { Provider } from "@ethersproject/abstract-provider";
 import { EntryPoint__factory } from "@account-abstraction/contracts";
+import { getEntryPointAddress } from "@account-abstraction/utils";
 import fetch from "node-fetch";
 
 // Based on https://github.com/eth-infinitism/bundler#running-local-node
 const BUNDLER_URL = "http://localhost:3000/rpc";
-const ENTRYPOINT_ADDRESS = "0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789";
+const ENTRYPOINT_ADDRESS = getEntryPointAddress();
+
+console.log("ENTRYPOINT_ADDR:", ENTRYPOINT_ADDRESS);
 
 const wasmFilePath = `snark-artifacts/semaphore.wasm`;
 const zkeyFilePath = `snark-artifacts/semaphore.zkey`;
@@ -101,6 +104,8 @@ describe("#e2e", () => {
 
     // Our wallet access external contract storage slots (Semaphore data)
     // Factory contract creating such wallets needs to add a stake to prevent abuse
+
+    // NX> this line reverted
     await factoryContract.addStake(24 * 60 * 60, { value: parseEther("2") });
 
     // Create a random wallet and use our contract wallet to send money to that
