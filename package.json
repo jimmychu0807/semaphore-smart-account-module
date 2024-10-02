@@ -12,7 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "@account-abstraction/contracts": "^0.6.0",
-    "@account-abstraction/utils": "jimmychu0807/aa-bundler#semaphore-wallet/v1.1.0",
     "@openzeppelin/contracts": "^4.8.3",
     "@semaphore-protocol/contracts": "^3.10.1",
     "@semaphore-protocol/group": "^3.10.1",
