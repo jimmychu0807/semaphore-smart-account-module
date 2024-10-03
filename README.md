@@ -14,8 +14,6 @@ Building on top of sample contracts from [account-abstraction](https://github.co
 
 Note: the test don't cover the case when Semaphore group root is changed and the cached value in contract is outdated.
 
-
 ### Disclaimer
 
 The code here should only be considered as a reference implementation. It can contain bugs, and is NOT supposed to be used for production use-cases.
-

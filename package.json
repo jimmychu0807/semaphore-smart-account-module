@@ -7,12 +7,19 @@
     "compile": "hardhat compile",
     "test": "hardhat test --network localhost"
   },
-  "keywords": ["Semaphore", "MSCA"],
+  "keywords": [
+    "Semaphore",
+    "MSCA"
+  ],
   "contributors": [
     "Saleel P <saleel@saleel.xyz>",
     "Jimmy Chu <jimmychu0807@gmail.com>"
   ],
   "license": "ISC",
+  "scripts": {
+    "prettier": "prettier -c .",
+    "prettier:write": "prettier -w ."
+  },
   "dependencies": {
     "@account-abstraction/contracts": "^0.6.0",
     "@account-abstraction/utils": "link:../aa-bundler/packages/utils",
@@ -43,6 +50,7 @@
     "chai": "^4.3.7",
     "ethers": "^5.0.0",
     "hardhat": "^2.22.12",
+    "prettier": "^3.3.3",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.1",
     "typescript": "^5.0.4"

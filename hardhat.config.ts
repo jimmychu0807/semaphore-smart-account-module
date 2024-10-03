@@ -1,8 +1,8 @@
-import '@typechain/hardhat';
+import "@typechain/hardhat";
 import "@nomiclabs/hardhat-ethers";
 // import "@semaphore-protocol/hardhat"
-import "./tasks/deploy-semaphore"
-import "./tasks/deploy-semaphore-verifier"
+import "./tasks/deploy-semaphore";
+import "./tasks/deploy-semaphore-verifier";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -27,16 +27,16 @@ module.exports = {
       {
         version: "0.8.23",
         settings: {},
-      }
-    ]
+      },
+    ],
   },
   typechain: {
-    outDir: 'types',
-    target: 'ethers-v5'
+    outDir: "types",
+    target: "ethers-v5",
   },
   networks: {
     localhost: {
       url: "http://localhost:8545",
-    }
-  }
+    },
+  },
 };

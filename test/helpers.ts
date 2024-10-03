@@ -76,11 +76,7 @@ export function packUserOp(op: UserOperation, forSignature = true): string {
   }
 }
 
-export function getUserOpHash(
-  op: UserOperation,
-  entryPoint: string,
-  chainId: number
-): string {
+export function getUserOpHash(op: UserOperation, entryPoint: string, chainId: number): string {
   const userOpHash = keccak256(packUserOp(op, true));
   const enc = defaultAbiCoder.encode(
     ["bytes32", "address", "uint256"],

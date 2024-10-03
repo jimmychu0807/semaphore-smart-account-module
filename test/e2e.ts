@@ -8,12 +8,7 @@ import {
   SemaphoreAccountFactory__factory,
   SemaphoreAccountFactory,
 } from "../types";
-import {
-  defaultAbiCoder,
-  formatEther,
-  hexConcat,
-  parseEther,
-} from "ethers/lib/utils";
+import { defaultAbiCoder, formatEther, hexConcat, parseEther } from "ethers/lib/utils";
 import { generateProof } from "@semaphore-protocol/proof";
 import { UserOperation, getUserOpHash } from "./helpers";
 import { BigNumber, Signer } from "ethers";
@@ -68,9 +63,10 @@ describe("#e2e", () => {
     group = new Group(groupId, 20, [identity.commitment, 3n, 4n]);
 
     // Deploy account factory
-    factoryContract = await new SemaphoreAccountFactory__factory(
-      ethersSigner
-    ).deploy(ENTRYPOINT_ADDRESS, semaphoreContract.address);
+    factoryContract = await new SemaphoreAccountFactory__factory(ethersSigner).deploy(
+      ENTRYPOINT_ADDRESS,
+      semaphoreContract.address
+    );
 
     console.log("Factory address: ", factoryContract.address);
   });
@@ -89,10 +85,7 @@ describe("#e2e", () => {
     });
     const initialBalance = await ethersProvider.getBalance(walletAddress);
 
-    const entrypointContract = EntryPoint__factory.connect(
-      ENTRYPOINT_ADDRESS,
-      ethersSigner
-    );
+    const entrypointContract = EntryPoint__factory.connect(ENTRYPOINT_ADDRESS, ethersSigner);
 
     // Add some deposit in entry point contract for the wallet
     // This is optional - if there is no deposit, then wallet need to pay the fee from the wallet balance
@@ -110,15 +103,14 @@ describe("#e2e", () => {
     // Create a random wallet and use our contract wallet to send money to that
     const randomWallet = ethers.Wallet.createRandom();
     const transferAmount = parseEther("0.2");
-    const transferEthCallData =
-      SemaphoreAccount__factory.createInterface().encodeFunctionData(
-        "execute",
-        [
-          randomWallet.address, // recipient
-          transferAmount, // amount
-          "0x", // no need of data
-        ]
-      );
+    const transferEthCallData = SemaphoreAccount__factory.createInterface().encodeFunctionData(
+      "execute",
+      [
+        randomWallet.address, // recipient
+        transferAmount, // amount
+        "0x", // no need of data
+      ]
+    );
 
     // Create UserOp
     const userOp = {
@@ -126,10 +118,7 @@ describe("#e2e", () => {
       nonce: BigNumber.from(2).shl(64).toHexString(),
       initCode: hexConcat([
         factoryContract.address,
-        factoryContract.interface.encodeFunctionData("createAccount", [
-          group.id,
-          salt,
-        ]),
+        factoryContract.interface.encodeFunctionData("createAccount", [group.id, salt]),
       ]),
       callData: transferEthCallData,
       callGasLimit: BigNumber.from(2000000).toHexString(),
@@ -141,34 +130,21 @@ describe("#e2e", () => {
       signature: "0x", // This will be changed later
     };
 
-    const chainId = await ethers.provider
-      .getNetwork()
-      .then((net) => net.chainId);
+    const chainId = await ethers.provider.getNetwork().then((net) => net.chainId);
     const userOpHash = await getUserOpHash(userOp, ENTRYPOINT_ADDRESS, chainId);
 
     // Generate proof of membership
     const externalNullifier = 0; // Not needed - 0 used in the contract
     const signal = userOpHash; // Hash of UserOperation is the signal
-    const fullProof = await generateProof(
-      identity,
-      group,
-      externalNullifier,
-      signal,
-      {
-        wasmFilePath,
-        zkeyFilePath,
-      }
-    );
+    const fullProof = await generateProof(identity, group, externalNullifier, signal, {
+      wasmFilePath,
+      zkeyFilePath,
+    });
 
     // Encode proof and inputs as signature
     userOp.signature = defaultAbiCoder.encode(
       ["uint256[8]", "uint256", "uint256", "uint256"],
-      [
-        fullProof.proof,
-        fullProof.merkleTreeRoot,
-        group.depth,
-        fullProof.nullifierHash,
-      ]
+      [fullProof.proof, fullProof.merkleTreeRoot, group.depth, fullProof.nullifierHash]
     );
 
     // Send UserOp to the bundler
@@ -194,17 +170,11 @@ describe("#e2e", () => {
     // Wallet contract should have been created
     expect(await ethersProvider.getCode(walletAddress)).to.not.be.equal("0x");
 
-    const currentWalletBalance = formatEther(
-      await ethersProvider.getBalance(walletAddress)
-    );
-    const randomWalletBalance = formatEther(
-      await ethersProvider.getBalance(randomWallet.address)
-    );
+    const currentWalletBalance = formatEther(await ethersProvider.getBalance(walletAddress));
+    const randomWalletBalance = formatEther(await ethersProvider.getBalance(randomWallet.address));
 
     // Balance of wallet should be 0.8 ETH (1 - 0.2)
-    expect(currentWalletBalance).to.be.equal(
-      formatEther(initialBalance.sub(transferAmount))
-    );
+    expect(currentWalletBalance).to.be.equal(formatEther(initialBalance.sub(transferAmount)));
 
     // Balance of random wallet should be 0.2 ETH
     expect(randomWalletBalance).to.be.equal(formatEther(transferAmount));
