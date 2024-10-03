@@ -4,8 +4,8 @@
   "description": "Semaphore Wallet",
   "main": "index.js",
   "scripts": {
-    "compile": "hardhat compile",
-    "test": "hardhat test --network localhost"
+    "prettier": "prettier -c . && prettier -c --plugin prettier-plugin-solidity 'contracts/**/*.sol'",
+    "prettier:write": "prettier -w . && prettier -w --plugin prettier-plugin-solidity 'contracts/**/*.sol'"
   },
   "keywords": [
     "Semaphore",
@@ -16,23 +16,14 @@
     "Jimmy Chu <jimmychu0807@gmail.com>"
   ],
   "license": "ISC",
-  "scripts": {
-    "prettier": "prettier -c .",
-    "prettier:write": "prettier -w ."
-  },
   "dependencies": {
     "@account-abstraction/contracts": "^0.6.0",
     "@account-abstraction/utils": "link:../aa-bundler/packages/utils",
     "@openzeppelin/contracts": "^5.0.2",
-    "@semaphore-protocol/contracts": "^3.10.1",
-    "@semaphore-protocol/group": "^3.10.1",
-    "@semaphore-protocol/hardhat": "^3.10.1",
-    "@semaphore-protocol/identity": "^3.10.1",
-    "@semaphore-protocol/proof": "^3.10.1",
-    "@zk-kit/incremental-merkle-tree.sol": "^1.7.0",
-    "big-integer": "^1.6.51",
-    "circomlibjs": "^0.1.7",
-    "poseidon-solidity": "^0.0.5"
+    "@semaphore-protocol/group": "^4.2.0",
+    "@semaphore-protocol/identity": "^4.2.0",
+    "@semaphore-protocol/proof": "^4.2.0",
+    "@zk-kit/lean-imt.sol": "^2.0.0"
   },
   "devDependencies": {
     "@ethersproject/abstract-provider": "^5.7.0",
@@ -44,13 +35,13 @@
     "@typechain/ethers-v5": "^10.2.1",
     "@typechain/hardhat": "^6.1.6",
     "@types/chai": "^4.3.5",
-    "@types/circomlibjs": "^0.1.6",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.2.1",
     "chai": "^4.3.7",
     "ethers": "^5.0.0",
     "hardhat": "^2.22.12",
     "prettier": "^3.3.3",
+    "prettier-plugin-solidity": "^1.4.1",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.1",
     "typescript": "^5.0.4"
