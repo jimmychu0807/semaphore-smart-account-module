@@ -2,20 +2,13 @@ import { Wallet } from "ethers";
 import { wrapProvider } from "../bundler/packages/sdk/src/Provider";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { BytesLike, formatEther, parseEther } from "ethers/lib/utils";
-import {
-  SimpleAccount__factory,
-} from "../account-abstraction/contracts/dist";
-import {
-  ERC1967Proxy__factory,
-  EntryPoint__factory,
-} from "../account-abstraction/typechain";
+import { SimpleAccount__factory } from "../account-abstraction/contracts/dist";
+import { ERC1967Proxy__factory, EntryPoint__factory } from "../account-abstraction/typechain";
 
 (async () => {
   const provider = new JsonRpcProvider();
   const ethersSigner = provider.getSigner(0);
-  const balance = await provider.getCode(
-    "0xfe684bb6fad8b6ed97491a37e29b4461d567bd97"
-  );
+  const balance = await provider.getCode("0xfe684bb6fad8b6ed97491a37e29b4461d567bd97");
 
   console.log(balance);
 
@@ -29,10 +22,7 @@ import {
   const implementation = await new SimpleAccount__factory(ethersSigner).deploy(
     config.entryPointAddress
   );
-  const proxy = await new ERC1967Proxy__factory(ethersSigner).deploy(
-    implementation.address,
-    "0x"
-  );
+  const proxy = await new ERC1967Proxy__factory(ethersSigner).deploy(implementation.address, "0x");
   const account = SimpleAccount__factory.connect(proxy.address, ethersSigner);
 
   // const api = new SimpleAccountAPI({
@@ -76,9 +66,5 @@ import {
 
   const res = await aaProvider.httpRpcClient.sendUserOpToBundler(op);
 
-  console.log(
-    formatEther(
-      await provider.getBalance("0xCbcAC0388501E5317304D7Da1Ee3a082Df67336d")
-    )
-  );
+  console.log(formatEther(await provider.getBalance("0xCbcAC0388501E5317304D7Da1Ee3a082Df67336d")));
 })();
