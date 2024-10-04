@@ -1,5 +1,4 @@
-import { defaultAbiCoder, keccak256 } from "ethers/lib/utils";
-import { BigNumber, BigNumberish, BytesLike } from "ethers";
+import { AbiCoder, BigNumberish, BytesLike, keccak256 } from "ethers";
 
 export interface UserOperation {
   sender: string;
@@ -14,6 +13,8 @@ export interface UserOperation {
   paymasterAndData: BytesLike;
   signature: BytesLike;
 }
+
+const defaultAbiCoder = AbiCoder.defaultAbiCoder();
 
 export function packUserOp(op: UserOperation, forSignature = true): string {
   if (forSignature) {

@@ -68,7 +68,7 @@ contract SemaphoreAccount is BaseAccount, UUPSUpgradeable, Initializable {
   // Validate signature for the UserOperation
   // ZK Proof of membership and some inputs are encoded in `signature`
   function _validateSignature(
-    UserOperation calldata userOp,
+    PackedUserOperation calldata userOp,
     bytes32 userOpHash
   ) internal virtual override returns (uint256 validationData) {
     // Decode proof + inputs from signature

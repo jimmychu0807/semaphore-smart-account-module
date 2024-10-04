@@ -7,13 +7,12 @@ import {
   Semaphore,
   SemaphoreAccountFactory__factory,
   SemaphoreAccountFactory,
-} from "../types";
-import { defaultAbiCoder, formatEther, hexConcat, parseEther } from "ethers/lib/utils";
+} from "../typechain-types";
+import { AbiCoder, formatEther, concat, parseEther } from "ethers";
 import { generateProof } from "@semaphore-protocol/proof";
 import { UserOperation, getUserOpHash } from "./helpers";
-import { BigNumber, Signer } from "ethers";
-import { Provider } from "@ethersproject/abstract-provider";
-import { EntryPoint__factory } from "@account-abstraction/contracts";
+import { Signer, Provider } from "ethers";
+import { IEntryPoint__factory } from "@account-abstraction/utils";
 import { getEntryPointAddress } from "@account-abstraction/utils";
 
 // Based on https://github.com/eth-infinitism/bundler#running-local-node
@@ -34,6 +33,7 @@ describe("#e2e", () => {
   let semaphoreContract: Semaphore;
   let factoryContract: SemaphoreAccountFactory;
   let identity: Identity;
+  let defaultAbiCoder: AbiCoder;
   let group: Group;
   let groupId: number;
 
@@ -41,6 +41,7 @@ describe("#e2e", () => {
     ethersProvider = ethers.provider;
     accounts = (await ethers.getSigners()).map((s) => s.address);
     ethersSigner = await ethers.getSigner(accounts[0]);
+    defaultAbiCoder = AbiCoder.defaultAbiCoder();
 
     // Deploy semaphore contract to local network
     ({ semaphore: semaphoreContract } = (await hre.run("deploy:semaphore")) as {
@@ -85,7 +86,7 @@ describe("#e2e", () => {
     });
     const initialBalance = await ethersProvider.getBalance(walletAddress);
 
-    const entrypointContract = EntryPoint__factory.connect(ENTRYPOINT_ADDRESS, ethersSigner);
+    const entrypointContract = IEntryPoint__factory.connect(ENTRYPOINT_ADDRESS, ethersSigner);
 
     // Add some deposit in entry point contract for the wallet
     // This is optional - if there is no deposit, then wallet need to pay the fee from the wallet balance
@@ -115,17 +116,17 @@ describe("#e2e", () => {
     // Create UserOp
     const userOp = {
       sender: walletAddress,
-      nonce: BigNumber.from(2).shl(64).toHexString(),
-      initCode: hexConcat([
+      nonce: (2n << 64n).toString(16),
+      initCode: concat([
         factoryContract.address,
         factoryContract.interface.encodeFunctionData("createAccount", [group.id, salt]),
       ]),
       callData: transferEthCallData,
-      callGasLimit: BigNumber.from(2000000).toHexString(),
-      verificationGasLimit: BigNumber.from(1000000).toHexString(),
-      maxFeePerGas: BigNumber.from(3e9).toHexString(),
-      preVerificationGas: BigNumber.from(50000).toHexString(),
-      maxPriorityFeePerGas: BigNumber.from(1e9).toHexString(),
+      callGasLimit: 2000000n.toString(16),
+      verificationGasLimit: 1000000n.toString(16),
+      maxFeePerGas: BigInt(3e9).toString(16),
+      preVerificationGas: 50000n.toString(16),
+      maxPriorityFeePerGas: BigInt(1e9).toString(16),
       paymasterAndData: "0x",
       signature: "0x", // This will be changed later
     };
