@@ -4,6 +4,8 @@
   "description": "Semaphore Wallet",
   "main": "index.js",
   "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test --network localhost",
     "prettier": "prettier -c . && prettier -c --plugin prettier-plugin-solidity 'contracts/**/*.sol'",
     "prettier:write": "prettier -w . && prettier -w --plugin prettier-plugin-solidity 'contracts/**/*.sol'"
   },
@@ -23,30 +25,28 @@
     "@semaphore-protocol/group": "^4.2.0",
     "@semaphore-protocol/identity": "^4.2.0",
     "@semaphore-protocol/proof": "^4.2.0",
-    "@zk-kit/lean-imt.sol": "^2.0.0"
+    "@zk-kit/lean-imt.sol": "^2.0.0",
+    "poseidon-solidity": "^0.0.5"
   },
   "devDependencies": {
-    "@ethersproject/abstract-provider": "^5.7.0",
-    "@ethersproject/abstract-signer": "^5.7.0",
-    "@ethersproject/networks": "^5.7.0",
-    "@ethersproject/properties": "^5.7.0",
-    "@ethersproject/providers": "^5.7.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.12",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@nomiclabs/hardhat-ethers": "^2.2.3",
-    "@typechain/ethers-v5": "^10.2.1",
     "@typechain/hardhat": "^6.1.6",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.2.1",
     "chai": "^4.3.7",
-    "ethers": "^5.0.0",
+    "ethers": "^6.13.3",
     "hardhat": "^2.22.12",
     "prettier": "^3.3.3",
     "prettier-plugin-solidity": "^1.4.1",
-    "ts-node": "^10.9.1",
-    "typechain": "^8.1.1",
-    "typescript": "^5.0.4"
+    "ts-node": "^10.9.2",
+    "typechain": "^8.3.0",
+    "typescript": "^5.4.5"
   },
   "engines": {
     "node": ">=20.0.0"
-  }
+  },
+  "packageManager": "pnpm@9.12.0+sha256.a61b67ff6cc97af864564f4442556c22a04f2e5a7714fbee76a1011361d9b726"
 }

@@ -82,11 +82,15 @@ contract SemaphoreAccount is BaseAccount, UUPSUpgradeable, Initializable {
 
     try
       verifier.verifyProof(
-        merkleTreeRoot,
-        nullifierHash,
-        signal, // Signal
-        0, // External nullifier
-        proof,
+        [proof[0], proof[1]],
+        [[proof[2], proof[3]], [proof[4], proof[5]]],
+        [proof[6], proof[7]],
+        [
+          merkleTreeRoot,
+          0, // External nullifier
+          signal, // Signal
+          nullifierHash
+        ],
         merkleTreeDepth
       )
     {

@@ -24,6 +24,8 @@ task("deploy:semaphore", "Deploy a Semaphore contract")
 
         const semaphoreVerifier = await SemaphoreVerifierFactory.deploy();
 
+        console.log("semaphoreVerifier", semaphoreVerifier);
+
         semaphoreVerifierAddress = await semaphoreVerifier.getAddress();
 
         if (logs) {

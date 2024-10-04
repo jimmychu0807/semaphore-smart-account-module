@@ -1,6 +1,4 @@
-import "@typechain/hardhat";
-import "@nomiclabs/hardhat-ethers";
-// import "@semaphore-protocol/hardhat"
+import "@nomicfoundation/hardhat-toolbox";
 import "./tasks/deploy-semaphore";
 import "./tasks/deploy-semaphore-verifier";
 
