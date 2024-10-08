@@ -16,6 +16,27 @@ export interface UserOperation {
 
 const defaultAbiCoder = AbiCoder.defaultAbiCoder();
 
+export function transformToSend(userOp: UserOperation) {
+  const {
+    sender, nonce, initCode, callData, callGasLimit, verificationGasLimit,
+    preVerificationGas, maxFeePerGas, maxPriorityFeePerGas, paymasterAndData, signature
+  } = userOp;
+
+  return {
+    sender,
+    nonce: `0x${nonce.toString(16)}`,
+    initCode,
+    callData,
+    callGasLimit: `0x${callGasLimit.toString(16)}`,
+    verificationGasLimit: `0x${verificationGasLimit.toString(16)}`,
+    preVerificationGas: `0x${preVerificationGas.toString(16)}`,
+    maxFeePerGas: `0x${maxFeePerGas.toString(16)}`,
+    maxPriorityFeePerGas: `0x${maxPriorityFeePerGas.toString(16)}`,
+    paymasterAndData,
+    signature,
+  };
+}
+
 export function packUserOp(op: UserOperation, forSignature = true): string {
   if (forSignature) {
     return defaultAbiCoder.encode(

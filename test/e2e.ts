@@ -1,29 +1,21 @@
 import { expect } from "chai";
-import hre from "hardhat";
+import hre, { run, ethers } from "hardhat";
 import { Identity } from "@semaphore-protocol/identity";
 import { Group } from "@semaphore-protocol/group";
-import {
-  SemaphoreAccount__factory,
-  Semaphore,
-  SemaphoreAccountFactory__factory,
-  SemaphoreAccountFactory,
-} from "../typechain-types";
-import { AbiCoder, formatEther, concat, parseEther } from "ethers";
+import { Semaphore, SemaphoreAccountFactory, SemaphoreAccount__factory } from "../typechain-types";
+import { AbiCoder, Contract, Signer, Provider, formatEther, concat, parseEther } from "ethers";
 import { generateProof } from "@semaphore-protocol/proof";
-import { UserOperation, getUserOpHash } from "./helpers";
-import { Signer, Provider } from "ethers";
-import { IEntryPoint__factory } from "@account-abstraction/utils";
-import { getEntryPointAddress } from "@account-abstraction/utils";
+import { UserOperation, getUserOpHash, transformToSend } from "./helpers";
+import { IEntryPoint__factory, getEntryPointAddress } from "@account-abstraction/utils";
 
 // Based on https://github.com/eth-infinitism/bundler#running-local-node
 const BUNDLER_URL = "http://localhost:3000/rpc";
 const ENTRYPOINT_ADDRESS = getEntryPointAddress();
-console.log("ENTRYPOINT_ADDRESS:", ENTRYPOINT_ADDRESS);
+console.log("EntryPoint contract:", ENTRYPOINT_ADDRESS);
 
 const wasmFilePath = `snark-artifacts/semaphore.wasm`;
 const zkeyFilePath = `snark-artifacts/semaphore.zkey`;
-
-const { ethers } = hre;
+const merkleTreeDepth = 10;
 
 describe("#e2e", () => {
   let ethersProvider: Provider;
@@ -44,39 +36,37 @@ describe("#e2e", () => {
     defaultAbiCoder = AbiCoder.defaultAbiCoder();
 
     // Deploy semaphore contract to local network
-    ({ semaphore: semaphoreContract } = (await hre.run("deploy:semaphore")) as {
+    ({ semaphore: semaphoreContract } = (await run("deploy:semaphore")) as {
       semaphore: Semaphore;
     });
 
     // Create new semaphore on-chain group
-    groupId = 2023;
-    await semaphoreContract["createGroup(uint256,uint256,address)"](
-      groupId,
-      20, // tree depth
-      accounts[0] // admin of the group
-    );
+    groupId = 0;
+    semaphoreContract = semaphoreContract.connect(ethersSigner);
+
+    await semaphoreContract.createGroup();
 
     // Generate new semaphore identity and add to group
     identity = new Identity();
-    await semaphoreContract.addMembers(groupId, [identity.commitment, 3n, 4n]);
-
-    // Construct a local copy of same group
-    group = new Group(groupId, 20, [identity.commitment, 3n, 4n]);
+    group = new Group([identity.commitment, 3n, 4n]);
+    await semaphoreContract.addMembers(groupId, group.members);
 
     // Deploy account factory
-    factoryContract = await new SemaphoreAccountFactory__factory(ethersSigner).deploy(
+    const factory = await ethers.getContractFactory("SemaphoreAccountFactory", ethersSigner);
+    factoryContract = await factory.deploy(
       ENTRYPOINT_ADDRESS,
-      semaphoreContract.address
+      await semaphoreContract.getAddress()
     );
 
-    console.log("Factory address: ", factoryContract.address);
+    console.log("Factory address:", await factoryContract.getAddress());
   });
 
   it("should send UserOp to the bundler to have the wallet created and transfer some eth", async () => {
     const salt = Math.round(Math.random() * 100000);
-    const walletAddress = await factoryContract.getAddress(groupId, salt);
-
-    console.log("Counterfactual Wallet address: ", walletAddress);
+    // Note: there is a conflict between the ethers BaseContract getAddress() and the smart contract function
+    const getAddrOnchain = factoryContract.getFunction("getAddress");
+    const walletAddress = await getAddrOnchain.staticCall(groupId, salt);
+    console.log("Counterfactual Wallet address:", walletAddress);
 
     // Transfer 1ETH to the future account
     await ethersSigner.sendTransaction({
@@ -86,7 +76,7 @@ describe("#e2e", () => {
     });
     const initialBalance = await ethersProvider.getBalance(walletAddress);
 
-    const entrypointContract = IEntryPoint__factory.connect(ENTRYPOINT_ADDRESS, ethersSigner);
+    const entrypointContract = new Contract(ENTRYPOINT_ADDRESS, IEntryPoint__factory.abi, ethersSigner);
 
     // Add some deposit in entry point contract for the wallet
     // This is optional - if there is no deposit, then wallet need to pay the fee from the wallet balance
@@ -97,8 +87,6 @@ describe("#e2e", () => {
 
     // Our wallet access external contract storage slots (Semaphore data)
     // Factory contract creating such wallets needs to add a stake to prevent abuse
-
-    // NX> this line reverted
     await factoryContract.addStake(24 * 60 * 60, { value: parseEther("2") });
 
     // Create a random wallet and use our contract wallet to send money to that
@@ -116,36 +104,37 @@ describe("#e2e", () => {
     // Create UserOp
     const userOp = {
       sender: walletAddress,
-      nonce: (2n << 64n).toString(16),
+      nonce: 0n, // TODO: dynamically fetch user nonce here
       initCode: concat([
-        factoryContract.address,
-        factoryContract.interface.encodeFunctionData("createAccount", [group.id, salt]),
+        await factoryContract.getAddress(),
+        factoryContract.interface.encodeFunctionData("createAccount", [groupId, salt]),
       ]),
       callData: transferEthCallData,
-      callGasLimit: 2000000n.toString(16),
-      verificationGasLimit: 1000000n.toString(16),
-      maxFeePerGas: BigInt(3e9).toString(16),
-      preVerificationGas: 50000n.toString(16),
-      maxPriorityFeePerGas: BigInt(1e9).toString(16),
+      callGasLimit: 2000000n,
+      verificationGasLimit: 1000000n,
+      maxFeePerGas: BigInt(3e9),
+      preVerificationGas: 50000n,
+      maxPriorityFeePerGas: BigInt(1e9),
       paymasterAndData: "0x",
       signature: "0x", // This will be changed later
     };
 
     const chainId = await ethers.provider.getNetwork().then((net) => net.chainId);
-    const userOpHash = await getUserOpHash(userOp, ENTRYPOINT_ADDRESS, chainId);
+    const userOpHash = await getUserOpHash(userOp, ENTRYPOINT_ADDRESS, Number(chainId));
 
     // Generate proof of membership
-    const externalNullifier = 0; // Not needed - 0 used in the contract
+    const externalNullifier = 0n; // Not needed - 0 used in the contract
     const signal = userOpHash; // Hash of UserOperation is the signal
-    const fullProof = await generateProof(identity, group, externalNullifier, signal, {
-      wasmFilePath,
-      zkeyFilePath,
+
+    const fullProof = await generateProof(identity, group, externalNullifier, signal, merkleTreeDepth, {
+      wasm: wasmFilePath,
+      zkey: zkeyFilePath
     });
 
     // Encode proof and inputs as signature
     userOp.signature = defaultAbiCoder.encode(
       ["uint256[8]", "uint256", "uint256", "uint256"],
-      [fullProof.proof, fullProof.merkleTreeRoot, group.depth, fullProof.nullifierHash]
+      [fullProof.points, fullProof.merkleTreeRoot, merkleTreeDepth, fullProof.nullifier]
     );
 
     // Send UserOp to the bundler
@@ -156,7 +145,7 @@ describe("#e2e", () => {
       },
       body: JSON.stringify({
         method: "eth_sendUserOperation",
-        params: [userOp, ENTRYPOINT_ADDRESS],
+        params: [transformToSend(userOp), ENTRYPOINT_ADDRESS],
       }),
     });
 
