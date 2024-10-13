@@ -76,7 +76,11 @@ describe("#e2e", () => {
     });
     const initialBalance = await ethersProvider.getBalance(walletAddress);
 
-    const entrypointContract = new Contract(ENTRYPOINT_ADDRESS, IEntryPoint__factory.abi, ethersSigner);
+    const entrypointContract = new Contract(
+      ENTRYPOINT_ADDRESS,
+      IEntryPoint__factory.abi,
+      ethersSigner
+    );
 
     // Add some deposit in entry point contract for the wallet
     // This is optional - if there is no deposit, then wallet need to pay the fee from the wallet balance
@@ -126,10 +130,17 @@ describe("#e2e", () => {
     const externalNullifier = 0n; // Not needed - 0 used in the contract
     const signal = userOpHash; // Hash of UserOperation is the signal
 
-    const fullProof = await generateProof(identity, group, externalNullifier, signal, merkleTreeDepth, {
-      wasm: wasmFilePath,
-      zkey: zkeyFilePath
-    });
+    const fullProof = await generateProof(
+      identity,
+      group,
+      externalNullifier,
+      signal,
+      merkleTreeDepth,
+      {
+        wasm: wasmFilePath,
+        zkey: zkeyFilePath,
+      }
+    );
 
     // Encode proof and inputs as signature
     userOp.signature = defaultAbiCoder.encode(

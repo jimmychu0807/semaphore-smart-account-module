@@ -18,8 +18,17 @@ const defaultAbiCoder = AbiCoder.defaultAbiCoder();
 
 export function transformToSend(userOp: UserOperation) {
   const {
-    sender, nonce, initCode, callData, callGasLimit, verificationGasLimit,
-    preVerificationGas, maxFeePerGas, maxPriorityFeePerGas, paymasterAndData, signature
+    sender,
+    nonce,
+    initCode,
+    callData,
+    callGasLimit,
+    verificationGasLimit,
+    preVerificationGas,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+    paymasterAndData,
+    signature,
   } = userOp;
 
   return {
