@@ -13,8 +13,10 @@
     "MSCA"
   ],
   "scripts": {
-    "compile": "hardhat compile",
+    "compile": "hardhat check --typecheck && hardhat compile",
     "test": "hardhat test --network localhost",
+    "aa-env:up": "docker compose -f test/aa-env-docker-compose.yaml up",
+    "aa-env:down": "docker compose -f test/aa-env-docker-compose.yaml down",
     "prettier": "prettier -c . && prettier -c --plugin prettier-plugin-solidity 'contracts/**/*.sol'",
     "prettier:write": "prettier -w . && prettier -w --plugin prettier-plugin-solidity 'contracts/**/*.sol'"
   },
@@ -22,11 +24,11 @@
     "@account-abstraction/contracts": "^0.7.0",
     "@account-abstraction/utils": "link:../aa-bundler/packages/utils",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
-    "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@nomicfoundation/hardhat-ignition": "^0.15.0",
     "@nomicfoundation/hardhat-ignition-ethers": "^0.15.0",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "3.0.0",
+    "@nomicfoundation/hardhat-viem": "2.0.5",
     "@nomicfoundation/hardhat-verify": "^2.0.0",
     "@openzeppelin/contracts": "^5.0.2",
     "@semaphore-protocol/group": "^4.2.0",
@@ -42,13 +44,15 @@
     "ethers": "^6.4.0",
     "hardhat": "^2.22.12",
     "hardhat-gas-reporter": "^1.0.8",
+    "permissionless": "^0.2.7",
     "poseidon-solidity": "^0.0.5",
     "prettier": "^3.3.3",
     "prettier-plugin-solidity": "^1.4.1",
     "solidity-coverage": "^0.8.0",
     "ts-node": ">=8.0.0",
     "typechain": "^8.3.0",
-    "typescript": ">=4.5.0"
+    "typescript": "~5.0.0",
+    "viem": "2.21.19"
   },
   "engines": {
     "node": ">=20.0.0"
