@@ -13,8 +13,9 @@
     "MSCA"
   ],
   "scripts": {
-    "compile": "hardhat check --typecheck && hardhat compile",
-    "test": "hardhat test --network localhost",
+    "check": "tsc",
+    "compile": "hardhat --typecheck compile",
+    "test": "hardhat test test/smart-account-module.ts --network localhost",
     "aa-env:up": "docker compose -f test/aa-env-docker-compose.yaml up",
     "aa-env:down": "docker compose -f test/aa-env-docker-compose.yaml down",
     "prettier": "prettier -c . && prettier -c --plugin prettier-plugin-solidity 'contracts/**/*.sol'",

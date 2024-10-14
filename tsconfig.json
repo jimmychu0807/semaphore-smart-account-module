@@ -4,8 +4,17 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true
-  }
+  },
+  "include": [
+    "*.ts",
+    "ignition/**/*.ts",
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "tasks/**/*.ts"
+  ],
+  "exclude": ["node_modules", "typechain-types"]
 }

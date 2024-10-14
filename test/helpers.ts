@@ -1,4 +1,9 @@
 import { AbiCoder, BigNumberish, BytesLike, keccak256 } from "ethers";
+import { createBundlerClient } from "viem/account-abstraction";
+import { http } from "viem";
+import { foundry } from "viem/chains";
+
+import { BUNDLER_URL, PAYMASTER_URL } from "../config";
 
 export interface UserOperation {
   sender: string;
@@ -114,4 +119,38 @@ export function getUserOpHash(op: UserOperation, entryPoint: string, chainId: nu
     [userOpHash, entryPoint, chainId]
   );
   return keccak256(enc);
+}
+
+// ref: https://docs.pimlico.io/permissionless/how-to/local-testing
+export async function ensureBundlerIsReady() {
+  const bundlerClient = createBundlerClient({
+    chain: foundry,
+    transport: http(BUNDLER_URL),
+  });
+
+  while (true) {
+    try {
+      await bundlerClient.getChainId();
+      return;
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+}
+
+export async function ensurePaymasterIsReady() {
+  while (true) {
+    try {
+      // mock paymaster will open up this endpoint when ready
+      const res = await fetch(`${PAYMASTER_URL}/ping`);
+      const data = await res.json();
+      if (data.message !== "pong") {
+        throw new Error("paymaster not ready yet");
+      }
+
+      return;
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
 }
