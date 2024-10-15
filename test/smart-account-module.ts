@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import hre from "hardhat";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { encodePacked } from "viem";
+import { encodePacked, parseEther } from "viem";
 
 import { ensureBundlerIsReady, ensurePaymasterIsReady } from "./helpers";
 
@@ -12,14 +12,19 @@ describe("Semaphore Smart Account Module", function () {
   });
 
   async function smartAccountSetup() {
-    const { smartAccountClient, pimlicoClient } = await hre.run("deploy:erc7579");
-    return { smartAccountClient, pimlicoClient };
+    const result = await hre.run("deploy:erc7579");
+    return result;
   }
 
   it("should be able to install the Semaphore smart account module", async function () {
-    const { smartAccountClient, pimlicoClient } = await loadFixture(smartAccountSetup);
+    const { publicClient, smartAccount, smartAccountClient, pimlicoClient } =
+      await loadFixture(smartAccountSetup);
 
-    console.log("finish loading fixture");
+    const bal = await publicClient.getBalance({ address: smartAccount.address });
+    console.log(`smartAccount addr: ${smartAccount.address}, with bal: ${bal}`);
+
+    const accountId = await smartAccountClient.accountId();
+    console.log("smartAccount client AcctId:", accountId);
 
     const ownableExecutorModule = "0xc98B026383885F41d9a995f85FC480E9bb8bB891";
     const moduleData = encodePacked(["address"], ["0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"]);

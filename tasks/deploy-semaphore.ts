@@ -5,13 +5,13 @@ import { task, types } from "hardhat/config";
  * This task handles the deployment of dependent contracts like SemaphoreVerifier and PoseidonT3 if not provided.
  */
 task("deploy:semaphore", "Deploy a Semaphore contract")
-  .addOptionalParam<boolean>(
+  .addOptionalParam<string>(
     "semaphoreVerifier",
     "SemaphoreVerifier contract address",
     undefined,
     types.string
   )
-  .addOptionalParam<boolean>("poseidon", "Poseidon library address", undefined, types.string)
+  .addOptionalParam<string>("poseidon", "Poseidon library address", undefined, types.string)
   .addOptionalParam<boolean>("logs", "Print the logs", true, types.boolean)
   .setAction(
     async (

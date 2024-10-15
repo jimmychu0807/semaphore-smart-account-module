@@ -1,4 +1,5 @@
-export const PIMLICO_API_KEY = "pim_GmLA5MK9oKnB4yKFPfxunv";
+export const PRIVATE_KEY = process.env.PRIVATE_KEY;
+export const PIMLICO_API_KEY = process.env.PIMLICO_API_KEY;
 export const BUNDLER_URL = `http://localhost:4337`;
 export const NODE_URL = `http://localhost:8545`;
 export const PAYMASTER_URL = "http://localhost:3000";

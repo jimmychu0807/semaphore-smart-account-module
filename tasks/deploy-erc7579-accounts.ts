@@ -12,18 +12,20 @@ import {
   NODE_URL,
   BUNDLER_URL,
   PAYMASTER_URL,
+  PRIVATE_KEY,
   SAFE_4337_MODULE_ADDR,
   ERC_7579_LAUNCHPAD_ADDR,
 } from "../config";
 
-task("deploy:erc7579", "Deploy ERC-7579 extended Smart Accounts").setAction(
-  async (taskArgs, hre) => {
-    const [ownerClient, bobClient] = await hre.viem.getWalletClients();
-    // console.log("ownerClient", ownerClient);
-
-    const owner = privateKeyToAccount(
-      "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-    );
+task("deploy:erc7579", "Deploy ERC-7579 extended Smart Accounts")
+  .addOptionalParam<boolean>(
+    "instantiate",
+    "Instantiate the smart account by a small transfer",
+    true,
+    types.boolean
+  )
+  .setAction(async ({ instantiate }, hre) => {
+    const owner = privateKeyToAccount(PRIVATE_KEY);
 
     const testClient = createTestClient({
       transport: http(NODE_URL),
@@ -47,24 +49,22 @@ task("deploy:erc7579", "Deploy ERC-7579 extended Smart Accounts").setAction(
       entryPoint,
     });
 
-    const smartAccount = await toSimpleSmartAccount({
+    // const smartAccount = await toSimpleSmartAccount({
+    //   client: publicClient,
+    //   owner,
+    //   entryPoint,
+    // });
+    const smartAccount = await toSafeSmartAccount({
       client: publicClient,
-      owner,
       entryPoint,
+      owners: [owner],
+      saltNonce: 0n, // optional
+      version: "1.4.1",
+      // safe4337ModuleAddress: SAFE_4337_MODULE_ADDR,
+      // erc7579LaunchpadAddress: ERC_7579_LAUNCHPAD_ADDR,
     });
 
-    // const smartAccount = await toSafeSmartAccount({
-    //   client: publicClient,
-    //   entryPoint,
-    //   owners: [owner],
-    //   saltNonce: 0n, // optional
-    //   version: "1.4.1",
-    //   safe4337ModuleAddress: SAFE_4337_MODULE_ADDR,
-    //   erc7579LaunchpadAddress: ERC_7579_LAUNCHPAD_ADDR,
-    // });
-
-    console.log("smartAccount addr:", smartAccount.address);
-
+    // Set the balance
     await testClient.setBalance({
       address: smartAccount.address,
       value: parseEther("100"),
@@ -79,14 +79,17 @@ task("deploy:erc7579", "Deploy ERC-7579 extended Smart Accounts").setAction(
           return (await pimlicoClient.getUserOperationGasPrice()).fast;
         },
       },
-    });
-    // .extend(erc7579Actions());
+    }).extend(erc7579Actions());
 
-    const txHash = await smartAccountClient.sendTransaction({
-      to: bob,
-      value: parseEther("0.01"),
-    });
+    if (instantiate) {
+      process.stdout.write("Transferring to Bob to instantiate the smart account...");
+      const bob = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+      const txHash = await smartAccountClient.sendTransaction({
+        to: bob,
+        value: parseEther("0.01"),
+      });
+      console.log("done");
+    }
 
-    return { pimlicoClient, smartAccount, smartAccountClient };
-  }
-);
+    return { pimlicoClient, publicClient, smartAccount, smartAccountClient, testClient };
+  });

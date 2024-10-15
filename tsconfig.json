@@ -9,12 +9,6 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": [
-    "*.ts",
-    "ignition/**/*.ts",
-    "src/**/*.ts",
-    "test/**/*.ts",
-    "tasks/**/*.ts"
-  ],
+  "include": ["*.ts", "ignition/**/*.ts", "src/**/*.ts", "test/**/*.ts", "tasks/**/*.ts"],
   "exclude": ["node_modules", "typechain-types"]
 }
